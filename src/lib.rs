@@ -100,7 +100,7 @@ fn split(text: String) -> PyResult<String> {
 
 /// A Python module implemented in Rust.
 #[pymodule]
-fn split_words(_py: Python, m: &PyModule) -> PyResult<()> {
+fn splitter(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(split, m)?)?;
     Ok(())
 }
