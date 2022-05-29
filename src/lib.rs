@@ -54,11 +54,6 @@ fn best_match(i: i32, text: String, cost: &mut Vec<f32>) -> (f32, f32) {
             .map_or(f32::MAX, |x| *x);
         array_min.push((c + word_cost, k as f32 + 1.0));
     }
-    let array_min_temp = array_min
-        .clone()
-        .into_iter()
-        .min_by(|a, b| a.partial_cmp(b).unwrap());
-    println!("{:?}", array_min_temp);
     return array_min
         .into_iter()
         .min_by(|a, b| a.partial_cmp(b).unwrap())
@@ -100,7 +95,7 @@ fn split(text: String) -> PyResult<String> {
 
 /// A Python module implemented in Rust.
 #[pymodule]
-fn splitter(_py: Python, m: &PyModule) -> PyResult<()> {
+fn rsplitter(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(split, m)?)?;
     Ok(())
 }
