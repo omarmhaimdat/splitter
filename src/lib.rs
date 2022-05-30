@@ -1,30 +1,21 @@
 use lazy_static::lazy_static;
 use std::collections::HashMap;
 
-use std::{
-    fs::File,
-    io::{prelude::*, BufReader},
-    path::Path,
-};
-
 use pyo3::prelude::*;
 
 lazy_static! {
-    static ref COST_DICT: (HashMap<String, f32>, i32) = get_cost_dict("corpus.txt");
+    static ref COST_DICT: (HashMap<String, f32>, i32) = get_cost_dict();
 }
 
-fn lines_from_file(filename: impl AsRef<Path>) -> Vec<String> {
-    let file = File::open(filename).expect("no such file");
-    let buf = BufReader::new(file);
-    buf.lines()
-        .map(|l| l.expect("Could not parse line"))
-        .collect()
+fn lines_from_file() -> Vec<String> {
+    let my_str = include_str!("corpus.txt");
+    my_str.lines().map(|l| l.to_string()).collect()
 }
 
 /// Get the cost dictionary from a list of words
-fn get_cost_dict(file_path: &str) -> (HashMap<String, f32>, i32) {
+fn get_cost_dict() -> (HashMap<String, f32>, i32) {
     let mut dict = HashMap::new();
-    let words = lines_from_file(file_path);
+    let words = lines_from_file();
     let words_length = words.len() as f32;
     let mut max_word = 0;
     for (idx, word) in words.iter().enumerate() {

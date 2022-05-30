@@ -15,6 +15,3 @@ classifiers = [
 authors = [
     { name = "Omar MHAIMDAT", email = "omarmhaidmat@gmail.com" }
 ]
-
-[tool.poetry]
-include = ["corpus.txt"]
