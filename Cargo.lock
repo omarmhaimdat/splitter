@@ -165,7 +165,7 @@ dependencies = [
 
 [[package]]
 name = "rsplitter"
-version = "0.1.4"
+version = "0.1.5"
 dependencies = [
  "lazy_static",
  "pyo3",
