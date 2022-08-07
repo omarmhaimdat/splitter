@@ -69,6 +69,18 @@ fn minimal_cost(text: String, cost: &mut Vec<f32>, text_length: u32) -> Vec<Stri
     return result;
 }
 
+/// A wrapper function for the split function
+/// # Arguments
+/// * `text` - The text to be split
+/// # Returns
+/// A String object containing the split text
+/// # Examples
+/// ```
+/// use split_rust::split_wrapper;
+/// let text = "Thequickbrownfoxjumpsoverthelazydog";
+/// split_wrapper(text);
+/// ```
+/// Result: "The quick brown fox jumps over the lazy dog"
 fn split_wrapper(text: String) -> String {
     let mut cost: Vec<f32> = Vec::new();
     cost.push(0.0);
@@ -78,7 +90,18 @@ fn split_wrapper(text: String) -> String {
     return texts.into_iter().rev().collect::<Vec<String>>().join(" ");
 }
 
-/// Formats the sum of two numbers as string.
+/// A wrapper function for the split function
+/// # Arguments
+/// * `text` - The text to be split
+/// # Returns
+/// A String object containing the split text
+/// # Examples
+/// ```
+/// import rsplitter
+/// text = "Thequickbrownfoxjumpsoverthelazydog";
+/// rsplitter.split(text);
+/// ```
+/// Result: "The quick brown fox jumps over the lazy dog"
 #[pyfunction]
 fn split(text: String) -> PyResult<String> {
     Ok(split_wrapper(text))

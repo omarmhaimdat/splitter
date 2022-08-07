@@ -2,6 +2,6 @@ import rsplitter
 import timeit
 
 def f():
-    rsplitter.split("wethepeopleoftheunitedstatesinordertoformamoreperfectunionestablishjusticeinsuredomestictranquilityprovideforthecommondefencepromotethegeneralwelfareandsecuretheblessingsoflibertytoourselvesandourposteritydoordainandestablishthisconstitutionfortheunitedstatesofamerica")
+    rsplitter.split("helloworld")
 
 print(f())
