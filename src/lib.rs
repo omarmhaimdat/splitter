@@ -1,3 +1,5 @@
+mod language_model;
+
 use lazy_static::lazy_static;
 use std::collections::HashMap;
 
@@ -7,12 +9,15 @@ lazy_static! {
     static ref COST_DICT: (HashMap<String, f32>, i32) = get_cost_dict();
 }
 
+/// Return a Vec containing all the words in the corpus
 fn lines_from_file() -> Vec<String> {
     let my_str = include_str!("corpus.txt");
     my_str.lines().map(|l| l.to_string()).collect()
 }
 
-/// Get the cost dictionary from a list of words
+/// Calculate the cost of each word in the corpus
+/// Return a Tuple containing a HashMap of words and their costs
+/// as values and the maximum cost as second value
 fn get_cost_dict() -> (HashMap<String, f32>, i32) {
     let mut dict = HashMap::new();
     let words = lines_from_file();
@@ -41,7 +46,11 @@ fn best_match(i: i32, text: String, cost: &mut Vec<f32>) -> (f32, f32) {
     for (k, c) in slice.iter().enumerate() {
         let word_cost = COST_DICT
             .0
-            .get(&text[(i - k as i32 - 1) as usize..i as usize].to_string())
+            .get(
+                &text[(i - k as i32 - 1) as usize..i as usize]
+                    .to_string()
+                    .to_lowercase(),
+            )
             .map_or(f32::MAX, |x| *x);
         array_min.push((c + word_cost, k as f32 + 1.0));
     }
@@ -51,6 +60,13 @@ fn best_match(i: i32, text: String, cost: &mut Vec<f32>) -> (f32, f32) {
         .unwrap();
 }
 
+/// Calculate the best match for a given text
+/// # Arguments
+/// * `text` - The text to be matched
+/// * `cost` - The cost of each word in the corpus
+/// * `text_length` - The length of the text
+/// # Returns
+/// A Vec of f32 containing the best match costs for each word in the corpus
 fn build_cost_array(text_length: u32, text: String, cost: &mut Vec<f32>) {
     for i in 1..(text_length + 1) {
         let (c, _k) = best_match(i as i32, text.clone(), cost);
@@ -58,12 +74,45 @@ fn build_cost_array(text_length: u32, text: String, cost: &mut Vec<f32>) {
     }
 }
 
+/// Calculate the optimal cost of a text
+/// # Arguments
+/// * `text` - The text to calculate the cost of
+/// * `cost` - The cost of each word in the corpus
+/// * `text_length` - The length of the text
+/// # Returns
+/// A Vec of strings containing the minimum costing words
 fn minimal_cost(text: String, cost: &mut Vec<f32>, text_length: u32) -> Vec<String> {
     let mut result: Vec<String> = Vec::new();
     let mut i = text_length;
     while i > 0 {
         let (_c, k) = best_match(i as i32, text.clone(), cost);
-        result.push(text[(i - k as u32) as usize..i as usize].to_string());
+        let mut new_token: bool = true;
+        if text[(i - k as u32) as usize..i as usize] != "'".to_string() {
+            let result_length = result.len();
+            if result_length > 0 {
+                if &result[&result.len() - 1] == &"'s".to_string()
+                    || (text[(i - k as u32) as usize..i as usize]
+                        .to_string()
+                        .chars()
+                        .next()
+                        .unwrap()
+                        .is_digit(10)
+                        && result[result.len() - 1]
+                            .chars()
+                            .next()
+                            .unwrap()
+                            .is_digit(10))
+                {
+                    let mut test = text[(i - k as u32) as usize..i as usize].to_string();
+                    test.push_str(&result[result_length - 1].to_string());
+                    result[result_length - 1] = test;
+                    new_token = false;
+                }
+            }
+        }
+        if new_token {
+            result.push(text[(i - k as u32) as usize..i as usize].to_string());
+        }
         i -= k as u32;
     }
     return result;
@@ -110,6 +159,7 @@ fn split(text: String) -> PyResult<String> {
 /// A Python module implemented in Rust.
 #[pymodule]
 fn rsplitter(_py: Python, m: &PyModule) -> PyResult<()> {
+    m.add_class::<language_model::LanguageModel>()?;
     m.add_function(wrap_pyfunction!(split, m)?)?;
     Ok(())
 }
@@ -119,8 +169,19 @@ mod tests {
     use super::*;
     #[test]
     fn it_works() {
-        let text = "helloworld";
+        let text = "Thequickbrownfoxjumpsoverthelazydog";
         let result = split_wrapper(text.to_string());
-        assert_eq!(result, "hello world");
+        assert_eq!(result, "The quick brown fox jumps over the lazy dog");
+    }
+
+    #[test]
+    fn test_split() {
+        let text = "Thequickbrownfoxjumpsoverthelazydog";
+        let mut language_model = language_model::LanguageModel {
+            corpus_path: "/Users/omarmhaimdat/Documents/splitter/src/corpus.txt".to_string(),
+            cost_dict: None,
+        };
+        let result = language_model.split_wrapper(text.to_string());
+        assert_eq!(result, "The quick brown fox jumps over the lazy dog");
     }
 }
