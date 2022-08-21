@@ -1,20 +1,46 @@
+"""
+Create a set unit test for rsplitter
+"""
+import unittest
+import time
+
 import rsplitter
-import timeit
 
-import wordninja
 
-model = rsplitter.LanguageModel("/Users/omarmhaimdat/Documents/splitter/src/corpus.txt")
-# model.split("Thequickbrownfoxjumpsoverthelazydog")
+class TestRsplitter(unittest.TestCase):
 
-model_ninja = wordninja.LanguageModel("/Users/omarmhaimdat/Documents/splitter/src/corpus.txt.gz")
-# model_ninja.split("Thequickbrownfoxjumpsoverthelazydog")
-# model.split("Thequickbrownfoxjumpsoverthelazydog")
+    def test_default(self):
+        """
+        Test the default rsplitter
+        """
+        self.assertEqual(rsplitter.split("Thequickbrownfoxjumpsoverthelazydog"), 'The quick brown fox jumps over the lazy dog')
 
-def f():
-    model.split("imateapot")
+    def test_custom_language_model(self):
+        """
+        Test the custom language model
+        """
+        language_model = rsplitter.LanguageModel('src/corpus.txt')
+        self.assertEqual(language_model.split("Thequickbrownfoxjumpsoverthelazydog"), 'The quick brown fox jumps over the lazy dog')
 
-def g():
-    model_ninja.split("imateapot")
+    def test_default_execution_speed(self):
+        """
+        Test the default execution speed
+        """
+        start = time.perf_counter()
+        rsplitter.split("Thequickbrownfoxjumpsoverthelazydog")
+        end = time.perf_counter()
+        self.assertLessEqual(end - start, 0.1)
 
-print(timeit.timeit(f, number=10000))
-print(timeit.timeit(g, number=10000))
+    def test_custom_language_model_execution_speed(self):
+        """
+        Test the custom language model execution speed
+        """
+        language_model = rsplitter.LanguageModel('src/corpus.txt')
+        start = time.perf_counter()
+        language_model.split("Thequickbrownfoxjumpsoverthelazydog")
+        end = time.perf_counter()
+        self.assertLessEqual(end - start, 0.1)
+
+
+if __name__ == '__main__':
+    unittest.main()
