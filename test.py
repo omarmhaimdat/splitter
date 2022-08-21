@@ -6,6 +6,15 @@ import time
 
 import rsplitter
 
+TEXTS = [
+    ("Thequickbrownfoxjumpsoverthelazydog", "The quick brown fox jumps over the lazy dog"),
+    ("rustisveryfast", "rust is very fast"),
+    ("pythonisfast", "python is fast"),
+    ("javaisjustbad", "java is just bad"),
+    ("cisgreat", "c is great"),
+    ("c++isc++", "c++ is c++"),
+]
+
 
 class TestRsplitter(unittest.TestCase):
 
@@ -14,6 +23,7 @@ class TestRsplitter(unittest.TestCase):
         Test the default rsplitter
         """
         self.assertEqual(rsplitter.split("Thequickbrownfoxjumpsoverthelazydog"), 'The quick brown fox jumps over the lazy dog')
+
 
     def test_custom_language_model(self):
         """
